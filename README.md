@@ -35,36 +35,25 @@ Before you begin, ensure you have the following installed:
 
 - **Node.js** (v18.x or higher)
 - **npm** (v9.x or higher)
-- **Docker** (for OnlyOffice Document Server)
-- **Docker Compose** (optional, for easier Docker management)
 
 ## Installation
 
-### 1. Clone the repository
+### 1. Create a new React project named onlyoffice-react using the Create React App package:
 
 ```bash
-git clone <your-repo-url>
-cd nexttest
+npx create-react-app onlyoffice-react
 ```
 
-### 2. Install dependencies
+### 2. Go to the newly created directory:
 
 ```bash
-npm install
+cd onlyoffice-react
 ```
 
-### 3. Verify installed packages
+### 3. Install ONLYOFFICE Docs React component from npm:
 
-The following packages will be installed:
-
-```json
-{
-  "@onlyoffice/document-editor-react": "^2.1.1",
-  "jsonwebtoken": "^9.0.2",
-  "next": "15.5.4",
-  "react": "19.1.0",
-  "react-dom": "19.1.0"
-}
+```bash
+npm install @onlyoffice/document-editor-react
 ```
 
 ## OnlyOffice Document Server Setup (Docker)
@@ -74,28 +63,26 @@ The following packages will be installed:
 #### Step 1: Pull the OnlyOffice Document Server Image
 
 ```bash
-docker pull onlyoffice/documentserver
+docker pull onlyoffice/documentserver:latest
 ```
 
-#### Step 2: Run OnlyOffice Document Server
+#### Step 2: Run OnlyOffice Document Server for Development
 
 **Basic Setup (No JWT):**
 
 ```bash
-docker run -i -t -d -p 8082:80 \
-  --name onlyoffice-document-server \
+docker run -i -t -d -p 8080:80 \
+  -e JWT_ENABLED=false \
+  -e JWT_SECRET=your_jwt_secret \
   onlyoffice/documentserver
 ```
 
 **Production Setup (With JWT Security):**
 
 ```bash
-docker run -i -t -d -p 8082:80 \
-  --name onlyoffice-document-server \
+docker run -i -t -d -p 8080:80 \
   -e JWT_ENABLED=true \
-  -e JWT_SECRET=onlyoffice \
-  -e JWT_HEADER=Authorization \
-  -e JWT_IN_BODY=true \
+  -e JWT_SECRET=your_jwt_secret \
   onlyoffice/documentserver
 ```
 
@@ -103,80 +90,43 @@ docker run -i -t -d -p 8082:80 \
 
 Open your browser and navigate to:
 ```
-http://localhost:8082/welcome
+http://localhost:8080
 ```
 
 You should see the OnlyOffice welcome page.
-
-### Advanced Docker Setup with Docker Compose
-
-Create a `docker-compose.yml` file:
-
-```yaml
-version: '3.8'
-
-services:
-  onlyoffice-documentserver:
-    image: onlyoffice/documentserver:latest
-    container_name: onlyoffice-document-server
-    ports:
-      - "8082:80"
-    environment:
-      - JWT_ENABLED=true
-      - JWT_SECRET=onlyoffice
-      - JWT_HEADER=Authorization
-      - JWT_IN_BODY=true
-    volumes:
-      - onlyoffice_data:/var/www/onlyoffice/Data
-      - onlyoffice_logs:/var/log/onlyoffice
-    restart: unless-stopped
-
-volumes:
-  onlyoffice_data:
-  onlyoffice_logs:
-```
-
-Run with Docker Compose:
-
-```bash
-docker-compose up -d
-```
-
-### Docker Management Commands
-
-```bash
-# Start the container
-docker start onlyoffice-document-server
-
-# Stop the container
-docker stop onlyoffice-document-server
-
-# View logs
-docker logs onlyoffice-document-server
-
-# Restart the container
-docker restart onlyoffice-document-server
-
-# Remove the container
-docker rm -f onlyoffice-document-server
-```
 
 ## Configuration
 
 ### Update Document Server URL
 
-In `src/app/real/page.js`, update the `documentServerUrl` to match your Docker host:
+In `src/App.js`, update the code:
 
 ```javascript
-<DocumentEditor
-  documentServerUrl="http://localhost:8082/"
-  // or your network IP
-  // documentServerUrl="http://192.168.1.157:8082/"
-  ...
-/>
+export default function App() {
+  return (
+    <DocumentEditor
+      id="docxEditor"
+      documentServerUrl="http://documentserver/"
+      config={{
+        document: {
+          fileType: "docx",
+          key: "Khirz6zTPdfd7",
+          title: "Example Document Title.docx",
+          url: "https://example.com/url-to-example-document.docx",
+        },
+        documentType: "word",
+        editorConfig: {
+          callbackUrl: "https://example.com/url-to-callback.ashx",
+        },
+      }}
+      events_onDocumentReady={onDocumentReady}
+      onLoadComponentError={onLoadComponentError}
+    />
+  )
+}
 ```
 
-### Update JWT Secret
+### Create a server
 
 Ensure the JWT secret matches in both files:
 
@@ -185,21 +135,6 @@ Ensure the JWT secret matches in both files:
 const JWT_SECRET = 'onlyoffice'; // Must match Document Server
 ```
 
-**In Docker run command:**
-```bash
--e JWT_SECRET=onlyoffice
-```
-
-### Configure Document URL
-
-In `src/app/api/real/route.js`, update the document URL:
-
-```javascript
-document: {
-  url: 'https://your-domain.com/path/to/document.docx',
-  // Must be publicly accessible by the Document Server
-}
-```
 
 **Important:** The document URL must be accessible from the OnlyOffice Document Server container. For local development, use ngrok or a similar service to expose your local files.
 
@@ -243,53 +178,7 @@ Generates a JWT token for OnlyOffice Document Server authentication.
 **Token Payload Structure:**
 
 ```javascript
-{
-  document: {
-    fileType: 'docx',
-    key: 'Khirz6zTPdfd7', // Unique document identifier
-    title: 'Untitled Document.docx',
-    url: 'https://your-domain.com/document.docx',
-    permissions: {
-      edit: true,
-      download: false,
-      print: true,
-      review: false,
-      chat: false,
-      comment: false,
-      protect: false
-    },
-    info: {
-      folder: "Downloads",
-      owner: "John Doe"
-    }
-  },
-  editorConfig: {
-    mode: 'edit', // or 'view'
-    user: {
-      id: "78e1e841",
-      name: "Sigmative"
-    },
-    coEditing: { 
-      mode: "strict", 
-      change: false 
-    },
-    customization: {
-      chat: false,
-      comments: false,
-      plugins: false,
-      feedback: false,
-      help: false,
-      autosave: false,
-      uiTheme: "theme-light",
-      features: {
-        saveAs: true,
-        open: true,
-        fileMenu: false
-      },
-      zoom: 90
-    }
-  }
-}
+
 ```
 
 ## Component Documentation
@@ -435,23 +324,5 @@ docker exec -it onlyoffice-document-server bash
 4. **Network:** Ensure Document Server can reach your application API
 5. **CORS:** Configure proper CORS headers if using external document URLs
 
-## License
 
-This project is for demonstration purposes. Please refer to OnlyOffice licensing for commercial use.
-
-## Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
-
----
-
-**Version:** 1.0.0  
-**Last Updated:** October 2025  
-**Maintained by:** Your Team
 
