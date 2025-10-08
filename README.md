@@ -16,11 +16,11 @@ A complete implementation of OnlyOffice Document Editor integrated with React, f
 - [Environment Variables](#environment-variables)
 - [Troubleshooting](#troubleshooting)
 
-## 🎯 Overview
+## Overview
 
 This application provides a seamless integration of OnlyOffice Document Server with React, allowing users to view and edit documents (DOCX, XLSX, PPTX) directly in the browser with JWT-based security.
 
-## ✨ Features
+## Features
 
 - **Real-time Document Editing** - Edit DOCX files in the browser
 - **JWT Authentication** - Secure token-based authentication
@@ -29,7 +29,7 @@ This application provides a seamless integration of OnlyOffice Document Server w
 - **Co-editing Support** - Strict mode collaborative editing
 - **Lightweight Integration** - Simple React component integration
 
-## 📦 Prerequisites
+## Prerequisites
 
 Before you begin, ensure you have the following installed:
 
@@ -38,7 +38,7 @@ Before you begin, ensure you have the following installed:
 - **Docker** (for OnlyOffice Document Server)
 - **Docker Compose** (optional, for easier Docker management)
 
-## 🚀 Installation
+## Installation
 
 ### 1. Clone the repository
 
@@ -67,7 +67,7 @@ The following packages will be installed:
 }
 ```
 
-## 🐳 OnlyOffice Document Server Setup (Docker)
+## OnlyOffice Document Server Setup (Docker)
 
 ### Quick Setup with Docker Run
 
@@ -161,7 +161,7 @@ docker restart onlyoffice-document-server
 docker rm -f onlyoffice-document-server
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 ### Update Document Server URL
 
@@ -227,7 +227,7 @@ Navigate to:
 http://localhost:3000/real
 ```
 
-## 📡 API Documentation
+## API Documentation
 
 ### GET `/api/real`
 
@@ -292,7 +292,7 @@ Generates a JWT token for OnlyOffice Document Server authentication.
 }
 ```
 
-## 🎨 Component Documentation
+## Component Documentation
 
 ### DocumentEditor Component
 
@@ -318,7 +318,7 @@ Located in `src/app/real/page.js`
 | `editorConfig.user` | object | User information |
 | `customization.uiTheme` | string | UI theme ('theme-light', 'theme-dark') |
 
-## 🔐 Environment Variables
+## Environment Variables
 
 Create a `.env.local` file in the root directory:
 
@@ -420,7 +420,7 @@ docker logs -f onlyoffice-document-server
 docker exec -it onlyoffice-document-server bash
 ```
 
-## 📚 Additional Resources
+## Additional Resources
 
 - [OnlyOffice API Documentation](https://api.onlyoffice.com/editors/basic)
 - [OnlyOffice React Integration](https://www.npmjs.com/package/@onlyoffice/document-editor-react)
@@ -435,11 +435,11 @@ docker exec -it onlyoffice-document-server bash
 4. **Network:** Ensure Document Server can reach your application API
 5. **CORS:** Configure proper CORS headers if using external document URLs
 
-## 📝 License
+## License
 
 This project is for demonstration purposes. Please refer to OnlyOffice licensing for commercial use.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please follow these steps:
 
