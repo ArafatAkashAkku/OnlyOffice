@@ -332,7 +332,7 @@ docker inspect onlyoffice/documentserver
 - [JWT.io - JWT Debugger](https://jwt.io/)
 - [Docker Documentation](https://docs.docker.com/)
 
-## 🔑 Key Points
+## Key Points
 
 1. **JWT Secret:** Must match between application and Document Server
 2. **Document Key:** Must be unique and change when document content changes
@@ -341,6 +341,9 @@ docker inspect onlyoffice/documentserver
 5. **CORS:** Configure proper CORS headers if using external document URLs
 
 ---
+
+## Document History
+
 ** Document Version:** 1.0.0
-  
+
 ** Last Updated:** October 09, 2025   
