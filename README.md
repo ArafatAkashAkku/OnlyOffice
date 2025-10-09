@@ -13,6 +13,8 @@ A complete implementation of OnlyOffice Document Editor integrated with React, f
 - [Running the Application](#running-the-application)
 - [API Documentation](#api-documentation)
 - [Component Documentation](#component-documentation)
+- [Troubleshooting](#troubleshooting)
+- [Additional Resources](#additional-resources)
 
 ## Overview
 
@@ -133,6 +135,9 @@ export default function App() {
 ```
 
 **Important:** The document URL must be accessible from the OnlyOffice Document Server container.
+```bash
+example from docker documentServerUrl= http://localhost:8080/
+```
 
 ## Running the Application
 
@@ -265,7 +270,7 @@ More options are added that can be useful for customizations
 | `editorConfig.customization.features.open` | boolean | Enable/disable 'Open' option |
 | `editorConfig.customization.features.fileMenu` | boolean | Enable/disable file menu |
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -334,11 +339,11 @@ docker inspect onlyoffice/documentserver
 
 ## Key Points
 
-1. **JWT Secret:** Must match between application and Document Server
-2. **Document Key:** Must be unique and change when document content changes
-3. **Document URL:** Must be publicly accessible from Document Server container
-4. **Network:** Ensure Document Server can reach your application API
-5. **CORS:** Configure proper CORS headers if using external document URLs
+- JWT Secret: Must match between application and Document Server
+- Document Key: Must be unique and change when document content changes
+- Document URL: Must be publicly accessible from Document Server container
+- Network: Ensure Document Server can reach your application API
+- CORS: Configure proper CORS headers if using external document URLs
 
 ---
 
