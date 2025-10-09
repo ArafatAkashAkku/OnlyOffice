@@ -123,8 +123,8 @@ export default function App() {
           callbackUrl: "https://example.com/url-to-callback.ashx",
         },
       }}
-      events_onDocumentReady={onDocumentReady}
-      onLoadComponentError={onLoadComponentError}
+      events_onDocumentReady={() => console.log("Document ready")}
+      onLoadComponentError={(code, desc) => console.error(code, desc)}
     />
   )
 }
