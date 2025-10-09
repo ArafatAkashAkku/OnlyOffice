@@ -184,23 +184,24 @@ const app = express();
 app.use(cors()); // allow cors
 
 app.get('/api/token', (req, res) => { 
+  const JWT_SECRET = 'your_secret_key'; // must match Document Server
 
-    const JWT_SECRET = 'your_secret_key'; // must match Document Server
+  const payload = {
+    document: {
+      fileType: "docx",
+      key: "RandomKey",
+      title: "Example Document Title.docx",
+      url: "https://example.com/url-to-example-document.docx",
+    },
+    editorConfig: {
+      callbackUrl: "https://example.com/url-to-callback.ashx",
+    },
+  }
 
-    const payload = {
-       document: {
-          fileType: "docx",
-          key: "RandomKey",
-          title: "Example Document Title.docx",
-          url: "https://example.com/url-to-example-document.docx",
-        },
-        editorConfig: {
-          callbackUrl: "https://example.com/url-to-callback.ashx",
-        },
-    }
+  const token = jwt.sign(payload, JWT_SECRET);
 
-    const token = jwt.sign(payload, JWT_SECRET);
-    res.json({ token });
+  res.json({ token });
+  
 });
 
 app.listen(5000, () => {
