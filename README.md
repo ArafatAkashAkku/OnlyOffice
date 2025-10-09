@@ -40,15 +40,10 @@ Before you begin, ensure you have the following installed:
 
 ```bash
 npx create-react-app onlyoffice-react
-```
-
-### 2. Go to the newly created directory:
-
-```bash
 cd onlyoffice-react
 ```
 
-### 3. Install ONLYOFFICE Docs React component from npm:
+### 2. Install ONLYOFFICE Docs React component from npm:
 
 ```bash
 npm install @onlyoffice/document-editor-react
@@ -118,7 +113,7 @@ export default function App() {
       id="docxEditor"
       documentServerUrl="http://documentserver/"
       config={{
-        token, // token will be fetched from api server with jwt
+        token,
         documentType: "word",
         document: {
           fileType: "docx",
@@ -139,22 +134,15 @@ export default function App() {
 
 **Important:** The document URL must be accessible from the OnlyOffice Document Server container.
 
-## 🎮 Running the Application
+## Running the Application
 
 ### Development Mode
 
 ```bash
-npm run dev
+npm start
 ```
 
 The application will start on `http://localhost:3000`
-
-### Production Build
-
-```bash
-npm run build
-npm start
-```
 
 ### Access the Document Editor
 
@@ -215,6 +203,12 @@ app.listen(5000, () => {
 });
 ```
 
+This is your customized API for token:
+
+```
+http://localhost:5000/api/token
+```
+
 ## Component Documentation
 
 ### DocumentEditor Component
@@ -229,6 +223,7 @@ Located in `src/App.js`
 - `onLoadComponentError` - Error handler callback
 
 **Configuration Options:**
+More options are added that can be useful for customizations
 
 | Option | Type | Description |
 |--------|------|-------------|
@@ -257,18 +252,18 @@ Located in `src/App.js`
 | `editorConfig.coEditing` | object | Co-editing configuration |
 | `editorConfig.coEditing.mode` | string | Co-editing mode ('strict' or 'fast') |
 | `editorConfig.coEditing.change` | boolean | Track changes in co-editing |
-| `customization.uiTheme` | string | UI theme ('theme-light', 'theme-dark') |
-| `customization.chat` | boolean | Enable/disable chat interface |
-| `customization.comments` | boolean | Enable/disable comments interface |
-| `customization.plugins` | boolean | Enable/disable plugins |
-| `customization.feedback` | boolean | Enable/disable feedback option |
-| `customization.help` | boolean | Enable/disable help menu |
-| `customization.autosave` | boolean | Enable/disable autosave functionality |
-| `customization.zoom` | number | Default zoom level (e.g., 90 for 90%) |
-| `customization.features` | object | Feature toggles for UI elements |
-| `customization.features.saveAs` | boolean | Enable/disable 'Save As' option |
-| `customization.features.open` | boolean | Enable/disable 'Open' option |
-| `customization.features.fileMenu` | boolean | Enable/disable file menu |
+| `editorConfig.customization.uiTheme` | string | UI theme ('theme-light', 'theme-dark') |
+| `editorConfig.customization.chat` | boolean | Enable/disable chat interface |
+| `editorConfig.customization.comments` | boolean | Enable/disable comments interface |
+| `editorConfig.customization.plugins` | boolean | Enable/disable plugins |
+| `editorConfig.customization.feedback` | boolean | Enable/disable feedback option |
+| `editorConfig.customization.help` | boolean | Enable/disable help menu |
+| `editorConfig.customization.autosave` | boolean | Enable/disable autosave functionality |
+| `editorConfig.customization.zoom` | number | Default zoom level (e.g., 90 for 90%) |
+| `editorConfig.customization.features` | object | Feature toggles for UI elements |
+| `editorConfig.customization.features.saveAs` | boolean | Enable/disable 'Save As' option |
+| `editorConfig.customization.features.open` | boolean | Enable/disable 'Open' option |
+| `editorConfig.customization.features.fileMenu` | boolean | Enable/disable file menu |
 
 ## 🛠️ Troubleshooting
 
@@ -280,7 +275,7 @@ Located in `src/App.js`
 
 **Solution:**
 - Check if Docker container is running: `docker ps`
-- Verify the port mapping: `docker port onlyoffice-document-server`
+- Verify the port mapping: `docker port <CONTAINER_ID>`
 - Ensure firewall allows port 8080
 - Check the `documentServerUrl` in your component
 
@@ -299,7 +294,6 @@ Located in `src/App.js`
 
 **Solution:**
 - Document URL must be publicly accessible
-- Use ngrok for local development: `ngrok http 3000`
 - Ensure CORS is properly configured on your file server
 - Check network connectivity from Docker container to document URL
 
@@ -311,7 +305,7 @@ Located in `src/App.js`
 - Check browser console for errors
 - Verify React version compatibility (19.1.0)
 - Ensure token is being fetched successfully
-- Check OnlyOffice Document Server logs: `docker logs onlyoffice-document-server`
+- Check OnlyOffice Document Server logs: `docker logs <CONTAINER_ID>`
 
 
 ### Debug Mode
@@ -319,27 +313,16 @@ Located in `src/App.js`
 Enable detailed logging:
 
 ```javascript
-// In src/app/real/page.js
+// In src/App.js
 console.log("Token:", token);
 console.log("Document Server URL:", documentServerUrl);
-
-// Add error handler
-events_onError={(error) => {
-  console.error("OnlyOffice Error:", error);
-}}
 ```
 
 ### Check Docker Container Health
 
 ```bash
 # Check container status
-docker inspect onlyoffice-document-server
-
-# Check container logs
-docker logs -f onlyoffice-document-server
-
-# Execute command inside container
-docker exec -it onlyoffice-document-server bash
+docker inspect onlyoffice/documentserver
 ```
 
 ## Additional Resources
@@ -357,5 +340,7 @@ docker exec -it onlyoffice-document-server bash
 4. **Network:** Ensure Document Server can reach your application API
 5. **CORS:** Configure proper CORS headers if using external document URLs
 
-
-
+---
+** Document Version:** 1.0.0
+  
+** Last Updated:** October 09, 2025   
