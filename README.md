@@ -13,8 +13,6 @@ A complete implementation of OnlyOffice Document Editor integrated with React, f
 - [Running the Application](#running-the-application)
 - [API Documentation](#api-documentation)
 - [Component Documentation](#component-documentation)
-- [Environment Variables](#environment-variables)
-- [Troubleshooting](#troubleshooting)
 
 ## Overview
 
@@ -102,19 +100,32 @@ You should see the OnlyOffice welcome page.
 In `src/App.js`, update the code:
 
 ```javascript
+import { useState, useEffect } from "react";
+import { DocumentEditor } from "@onlyoffice/document-editor-react";
+
 export default function App() {
+  const [token, setToken] = useState("");
+
+  useEffect(() => {
+    fetch(`http://example.com/api/token`) // api server
+      .then(res => res.json())
+      .then(data => setToken(data.token))
+      .catch(err => console.error(err));
+  }, []);
+  
   return (
     <DocumentEditor
       id="docxEditor"
       documentServerUrl="http://documentserver/"
       config={{
+        token, // token will be fetched from api server with jwt
+        documentType: "word",
         document: {
           fileType: "docx",
-          key: "Khirz6zTPdfd7",
+          key: "RandomKey",
           title: "Example Document Title.docx",
           url: "https://example.com/url-to-example-document.docx",
         },
-        documentType: "word",
         editorConfig: {
           callbackUrl: "https://example.com/url-to-callback.ashx",
         },
@@ -128,15 +139,15 @@ export default function App() {
 
 ### Create a server
 
-Ensure the JWT secret matches in both files:
+Ensure the JWT secret matches in both docker and server api:
 
-**In `src/app/api/real/route.js`:**
+
 ```javascript
-const JWT_SECRET = 'onlyoffice'; // Must match Document Server
+const JWT_SECRET = 'your_jwt_secret'; // Must match Document Server
 ```
 
 
-**Important:** The document URL must be accessible from the OnlyOffice Document Server container. For local development, use ngrok or a similar service to expose your local files.
+**Important:** The document URL must be accessible from the OnlyOffice Document Server container.
 
 ## 🎮 Running the Application
 
@@ -159,12 +170,12 @@ npm start
 
 Navigate to:
 ```
-http://localhost:3000/real
+http://localhost:3000/
 ```
 
 ## API Documentation
 
-### GET `/api/real`
+### GET `/api/token`
 
 Generates a JWT token for OnlyOffice Document Server authentication.
 
@@ -175,17 +186,11 @@ Generates a JWT token for OnlyOffice Document Server authentication.
 }
 ```
 
-**Token Payload Structure:**
-
-```javascript
-
-```
-
 ## Component Documentation
 
 ### DocumentEditor Component
 
-Located in `src/app/real/page.js`
+Located in `src/App.js`
 
 **Props:**
 - `id` - Unique identifier for the editor instance
@@ -207,25 +212,6 @@ Located in `src/app/real/page.js`
 | `editorConfig.user` | object | User information |
 | `customization.uiTheme` | string | UI theme ('theme-light', 'theme-dark') |
 
-## Environment Variables
-
-Create a `.env.local` file in the root directory:
-
-```bash
-# OnlyOffice Configuration
-ONLYOFFICE_SERVER_URL=http://localhost:8082
-ONLYOFFICE_JWT_SECRET=onlyoffice
-
-# Application Configuration
-NEXT_PUBLIC_API_URL=http://localhost:3000
-```
-
-Update your code to use environment variables:
-
-```javascript
-const JWT_SECRET = process.env.ONLYOFFICE_JWT_SECRET || 'onlyoffice';
-```
-
 ## 🛠️ Troubleshooting
 
 ### Common Issues
@@ -237,7 +223,7 @@ const JWT_SECRET = process.env.ONLYOFFICE_JWT_SECRET || 'onlyoffice';
 **Solution:**
 - Check if Docker container is running: `docker ps`
 - Verify the port mapping: `docker port onlyoffice-document-server`
-- Ensure firewall allows port 8082
+- Ensure firewall allows port 8080
 - Check the `documentServerUrl` in your component
 
 #### 2. JWT Token Validation Failed
@@ -247,7 +233,7 @@ const JWT_SECRET = process.env.ONLYOFFICE_JWT_SECRET || 'onlyoffice';
 **Solution:**
 - Ensure `JWT_SECRET` matches in both API and Docker container
 - Verify JWT is enabled in Docker: `-e JWT_ENABLED=true`
-- Check that `JWT_IN_BODY=true` is set in Docker environment
+- Check that `JWT_SECRET=your_secret_key` is set in Docker environment
 
 #### 3. Document URL not accessible
 
@@ -269,17 +255,6 @@ const JWT_SECRET = process.env.ONLYOFFICE_JWT_SECRET || 'onlyoffice';
 - Ensure token is being fetched successfully
 - Check OnlyOffice Document Server logs: `docker logs onlyoffice-document-server`
 
-#### 5. Network Issues with Docker
-
-**Solution:**
-```bash
-# Use host network mode (Linux only)
-docker run -i -t -d --network=host \
-  --name onlyoffice-document-server \
-  -e JWT_ENABLED=true \
-  -e JWT_SECRET=onlyoffice \
-  onlyoffice/documentserver
-```
 
 ### Debug Mode
 
