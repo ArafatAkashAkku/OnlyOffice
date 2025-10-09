@@ -137,16 +137,6 @@ export default function App() {
 }
 ```
 
-### Create a server
-
-Ensure the JWT secret matches in both docker and server api:
-
-
-```javascript
-const JWT_SECRET = 'your_jwt_secret'; // Must match Document Server
-```
-
-
 **Important:** The document URL must be accessible from the OnlyOffice Document Server container.
 
 ## 🎮 Running the Application
@@ -186,6 +176,45 @@ Generates a JWT token for OnlyOffice Document Server authentication.
 }
 ```
 
+
+### Create a server (Example: Express Server)
+
+Ensure the JWT secret matches in both docker and server api:
+
+
+```javascript
+const express = require('express'); 
+const jwt = require('jsonwebtoken'); 
+const cors = require('cors');
+const app = express(); 
+
+app.use(cors()); // allow cors
+
+app.get('/api/token', (req, res) => { 
+
+    const JWT_SECRET = 'your_secret_key'; // must match Document Server
+
+    const payload = {
+       document: {
+          fileType: "docx",
+          key: "RandomKey",
+          title: "Example Document Title.docx",
+          url: "https://example.com/url-to-example-document.docx",
+        },
+        editorConfig: {
+          callbackUrl: "https://example.com/url-to-callback.ashx",
+        },
+    }
+
+    const token = jwt.sign(payload, JWT_SECRET);
+    res.json({ token });
+});
+
+app.listen(5000, () => {
+    console.log(`Server is running on port http://localhost:5000`);
+});
+```
+
 ## Component Documentation
 
 ### DocumentEditor Component
@@ -208,9 +237,38 @@ Located in `src/App.js`
 | `document.fileType` | string | File extension ('docx', 'xlsx', 'pptx') |
 | `document.key` | string | Unique document identifier (must change when document changes) |
 | `document.url` | string | Public URL to the document |
+| `document.title` | string | Display title for the document |
+| `document.permissions` | object | Granular permission controls |
+| `document.permissions.edit` | boolean | Allow editing the document |
+| `document.permissions.download` | boolean | Allow downloading the document |
+| `document.permissions.print` | boolean | Allow printing the document |
+| `document.permissions.review` | boolean | Allow reviewing/tracking changes |
+| `document.permissions.chat` | boolean | Enable chat functionality |
+| `document.permissions.comment` | boolean | Allow adding comments |
+| `document.permissions.protect` | boolean | Allow protecting document sections |
+| `document.info` | object | Additional document metadata |
+| `document.info.folder` | string | Folder location of the document |
+| `document.info.owner` | string | Document owner name |
 | `editorConfig.mode` | string | Editor mode ('edit' or 'view') |
+| `editorConfig.callbackUrl` | string | URL for document saving callbacks |
 | `editorConfig.user` | object | User information |
+| `editorConfig.user.id` | string | Unique user identifier |
+| `editorConfig.user.name` | string | User display name |
+| `editorConfig.coEditing` | object | Co-editing configuration |
+| `editorConfig.coEditing.mode` | string | Co-editing mode ('strict' or 'fast') |
+| `editorConfig.coEditing.change` | boolean | Track changes in co-editing |
 | `customization.uiTheme` | string | UI theme ('theme-light', 'theme-dark') |
+| `customization.chat` | boolean | Enable/disable chat interface |
+| `customization.comments` | boolean | Enable/disable comments interface |
+| `customization.plugins` | boolean | Enable/disable plugins |
+| `customization.feedback` | boolean | Enable/disable feedback option |
+| `customization.help` | boolean | Enable/disable help menu |
+| `customization.autosave` | boolean | Enable/disable autosave functionality |
+| `customization.zoom` | number | Default zoom level (e.g., 90 for 90%) |
+| `customization.features` | object | Feature toggles for UI elements |
+| `customization.features.saveAs` | boolean | Enable/disable 'Save As' option |
+| `customization.features.open` | boolean | Enable/disable 'Open' option |
+| `customization.features.fileMenu` | boolean | Enable/disable file menu |
 
 ## 🛠️ Troubleshooting
 
