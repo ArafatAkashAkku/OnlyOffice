@@ -66,19 +66,15 @@ docker pull onlyoffice/documentserver:latest
 **Basic Setup (No JWT):**
 
 ```bash
-docker run -i -t -d -p 8080:80 \
-  -e JWT_ENABLED=false \
-  -e JWT_SECRET=your_jwt_secret \
-  onlyoffice/documentserver
+docker run -it -d -p 8080:80 -e JWT_ENABLED=false -e JWT_SECRET=your_jwt_secret onlyoffice/documentserver
+
 ```
 
 **Production Setup (With JWT Security):**
 
 ```bash
-docker run -i -t -d -p 8080:80 \
-  -e JWT_ENABLED=true \
-  -e JWT_SECRET=your_jwt_secret \
-  onlyoffice/documentserver
+docker run -it -d -p 8080:80 -e JWT_ENABLED=true -e JWT_SECRET=your_jwt_secret onlyoffice/documentserver
+
 ```
 
 #### Step 3: Verify OnlyOffice is Running
@@ -134,9 +130,9 @@ export default function App() {
 }
 ```
 
-**Important:** The document URL must be accessible from the OnlyOffice Document Server container.
+**Important:** The document URL must be accessible from the OnlyOffice Document Server container. Replace the documentServerUrl in src/App.js as per your docker server url
 ```bash
-example from docker documentServerUrl= http://localhost:8080/
+documentServerUrl= http://localhost:8080/
 ```
 
 ## Running the Application
@@ -201,7 +197,7 @@ app.get('/api/token', (req, res) => {
   const token = jwt.sign(payload, JWT_SECRET);
 
   res.json({ token });
-  
+
 });
 
 app.listen(5000, () => {
