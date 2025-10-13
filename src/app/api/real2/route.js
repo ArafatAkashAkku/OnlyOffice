@@ -47,9 +47,9 @@ export async function GET(req) {
           zoom: 90,
         },
         plugins: {
-          autostart: ["asc.{insert-data-plugin-guid}"],
+          autostart: ["asc.{insert-data-real2-plugin-guid}"],
           pluginsData: [
-            "http://192.168.1.157:3000/plugins/insertdata/config.json"
+            "http://192.168.1.157:3000/plugins/insertdata-real2/config.json"
           ]
         },
     },

@@ -7,7 +7,7 @@ export default function HomePage() {
   const [token, setToken] = useState("");
 
   useEffect(() => {
-    fetch("/api/real")
+    fetch("/api/real2")
       .then(res => res.json())
       .then(data => setToken(data.token))
       .catch(err => console.error(err));
@@ -30,6 +30,7 @@ export default function HomePage() {
             key: 'Khirz6zTPdfd7',
             title: 'Untitled Document.docx',
             url: 'http://farid-staging-yluxk8.flywp.xyz/wp-content/uploads/2025/10/sample.docx',
+            // url: 'https://pub-2836371ba342490ca9651d5df3445000.r2.dev/documents/NoToken_1760351228911_uyv16mtx6_1760351260930.docx',
             permissions: {
               edit: true,
               download: false,
@@ -55,7 +56,7 @@ export default function HomePage() {
             customization: {
               chat: false,
               comments: false,
-              plugins: false,
+              plugins: true,
               feedback: false,
               help: false,
               autosave: false,
@@ -66,6 +67,12 @@ export default function HomePage() {
                 fileMenu: false,
               },
               zoom: 90,
+            },
+            plugins: {
+              autostart: ["asc.{insert-data-plugin-guid}"],
+              pluginsData: [
+                `http://192.168.1.157:3000/plugins/insertdata/config.json`
+              ]
             },
           },
         }}

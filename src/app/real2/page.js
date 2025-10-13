@@ -7,21 +7,23 @@ export default function HomePage() {
   const [token, setToken] = useState("");
 
   useEffect(() => {
-    fetch("/api/token")
+    fetch("/api/real2")
       .then(res => res.json())
       .then(data => setToken(data.token))
       .catch(err => console.error(err));
   }, []);
 
   if (!token) return <div>Loading document...</div>;
+  console.log(token);
 
   return (
     <div style={{ height: "100vh" }}>
       <DocumentEditor
         id="docxEditor"
-        documentServerUrl="http://192.168.1.157:8081/"
+        documentServerUrl="http://192.168.1.157:8082/"
+
         config = {{
-          // token, // added later
+          token, // added later
           documentType: 'word',
           document: {
             fileType: 'docx',
@@ -44,8 +46,7 @@ export default function HomePage() {
           },
           editorConfig: {
             mode: 'edit',
-            // callbackUrl: "http://localhost:8080/dummy-callback",
-            // callbackUrl: "http://192.168.1.157:3000/api/callback",
+            // callbackUrl: "http://192.168.1.157:3000/api/save",
             user: {
               id: "78e1e841",
               name: "Sigmative",
@@ -54,7 +55,7 @@ export default function HomePage() {
             customization: {
               chat: false,
               comments: false,
-              plugins: false,
+              plugins: true,
               feedback: false,
               help: false,
               autosave: false,
@@ -65,6 +66,12 @@ export default function HomePage() {
                 fileMenu: false,
               },
               zoom: 90,
+            },
+            plugins: {
+              autostart: ["asc.{insert-data-real2-plugin-guid}"],
+              pluginsData: [
+                `http://192.168.1.157:3000/plugins/insertdata-real2/config.json`
+              ]
             },
           },
         }}
