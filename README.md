@@ -267,6 +267,465 @@ More options are added that can be useful for customizations
 | `editorConfig.customization.features.open` | boolean | Enable/disable 'Open' option |
 | `editorConfig.customization.features.fileMenu` | boolean | Enable/disable file menu |
 
+
+
+
+## Advance Integration (Docx)
+
+Install Angular-Expressions Docstemplater File-Saver Pizzip on Frontend
+```
+npm install angular-expressions docxtemplater file-saver pizzip 
+```
+
+### New Integration Step by Step on Frontend
+Located in `public/`
+
+Create `public/plugins/insertdata`
+
+Create `public/plugins/insertdata/config.json`
+
+Create `public/plugins/insertdata/index.html`
+
+Create `public/plugins/insertdata/resources`
+
+Now in the `public/plugins/insertdata/config.json` file 
+```
+{
+  "name": "Insert Data",
+  "nameLocale": {
+    "en": "Insert Data"
+  },
+  "guid": "asc.{insert-data-plugin-guid}",
+  "version": "1.0.0",
+  "variations": [
+    {
+      "description": "Insert data fields into document",
+      "descriptionLocale": {
+        "en": "Insert data fields into document"
+      },
+      "url": "index.html",
+      "icons": ["resources/icon.svg", "resources/icon.svg"],
+      "icons2": [
+        {
+          "style": "light",
+          "100%": { "normal": "resources/icon.svg" },
+          "125%": { "normal": "resources/icon.svg" },
+          "150%": { "normal": "resources/icon.svg" },
+          "175%": { "normal": "resources/icon.svg" },
+          "200%": { "normal": "resources/icon.svg" }
+        },
+        {
+          "style": "dark",
+          "100%": { "normal": "resources/icon.svg" },
+          "125%": { "normal": "resources/icon.svg" },
+          "150%": { "normal": "resources/icon.svg" },
+          "175%": { "normal": "resources/icon.svg" },
+          "200%": { "normal": "resources/icon.svg" }
+        }
+      ],
+      "isViewer": false,
+      "EditorsSupport": ["word"],
+      "isVisual": true,
+      "isModal": false,
+      "isInsideMode": true,
+      "initDataType": "none",
+      "initData": "",
+      "isUpdateOleOnResize": false,
+      "buttons": []
+    }
+  ]
+}
+```
+
+
+Now in the `public/plugins/insertdata/index.html`
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insert Data Plugin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            padding: 16px;
+            background: #fff;
+            color: #333;
+            font-size: 13px;
+        }
+        
+        h3 {
+            margin-bottom: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .error {
+            padding: 12px;
+            background: #fee;
+            border: 1px solid #fcc;
+            border-radius: 4px;
+            color: #c33;
+            margin-bottom: 12px;
+        }
+        
+        .data-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .data-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            background: #f8f9fa;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .data-item:hover {
+            background: #e8f4ff;
+            border-color: #0969da;
+            transform: translateX(2px);
+        }
+        
+        .data-item:active {
+            transform: translateX(1px);
+            background: #d0e8ff;
+        }
+        
+        .data-label {
+            font-weight: 500;
+            color: #666;
+            min-width: 90px;
+            margin-right: 8px;
+        }
+        
+        .data-value {
+            color: #0969da;
+            font-weight: 500;
+            flex: 1;
+        }
+        
+        .insert-icon {
+            margin-left: auto;
+            opacity: 0.6;
+            font-size: 16px;
+        }
+        
+        .data-item:hover .insert-icon {
+            opacity: 1;
+        }
+
+    </style>
+    <script src="https://onlyoffice.github.io/sdkjs-plugins/v1/plugins.js"></script>
+</head>
+<body>
+    <h3>📋 Insert Data Fields</h3>
+    <div id="content">
+        <div class="loading">Loading data...</div>
+    </div>
+
+    <script>
+        (function(window, undefined) {
+            let userData = null;
+
+            // Initialize plugin
+            window.Asc.plugin.init = function() {
+                console.log('Plugin initialized');
+                loadUserData();
+            };
+
+            // Fetch user data from API
+            async function loadUserData() {
+                const contentDiv = document.getElementById('content');
+                try {
+                    const response = await fetch('http://localhost:5000/api/data'); // api url
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch data');
+                    }
+                    userData = await response.json();
+                    console.log('User data loaded:', userData);
+                    renderData();
+                } catch (error) {
+                    console.error('Error loading data:', error);
+                    contentDiv.innerHTML = '<div class="error">Failed to load data. Please try again.</div>';
+                }
+            }
+
+            // Render data items
+            function renderData() {
+                const contentDiv = document.getElementById('content');
+                if (!userData) {
+                    contentDiv.innerHTML = '<div class="error">No data available</div>';
+                    return;
+                }
+
+                const container = document.createElement('div');
+                container.className = 'data-container';
+
+                // Create clickable items for each field
+                for (const [key, value] of Object.entries(userData)) {
+                    const item = document.createElement('div');
+                    item.className = 'data-item';
+                    
+                    // Determine what to insert based on value
+                    const isNull = value === null || value === undefined || value === '';
+                    const textToInsert = isNull ? `{{${key}}}` : value;
+                    
+                    item.onclick = () => insertText(textToInsert);
+                    
+                    const label = document.createElement('span');
+                    label.className = 'data-label';
+                    label.textContent = formatLabel(key) + ':';
+                    
+                    const valueSpan = document.createElement('span');
+                    valueSpan.className = 'data-value';
+                    valueSpan.textContent = isNull ? `{{${key}}}` : value;
+                    valueSpan.style.color = isNull ? '#999' : '#0969da';
+                    valueSpan.style.fontStyle = isNull ? 'italic' : 'normal';
+                    
+                    const icon = document.createElement('span');
+                    icon.className = 'insert-icon';
+                    icon.textContent = '→';
+                    
+                    item.appendChild(label);
+                    item.appendChild(valueSpan);
+                    item.appendChild(icon);
+                    container.appendChild(item);
+                }
+
+                contentDiv.innerHTML = '';
+                contentDiv.appendChild(container);
+                
+                // Replace placeholders with actual values for non-null fields
+                replacePlaceholders();
+            }
+
+            // Format field names for display
+            function formatLabel(key) {
+                return key
+                    .replace(/([A-Z])/g, ' $1')
+                    .replace(/^./, str => str.toUpperCase())
+                    .trim();
+            }
+
+            // Insert text at cursor position
+            function insertText(text) {
+                console.log('Inserting text:', text);
+                
+                // Use the OnlyOffice plugin API to insert text at cursor
+                window.Asc.plugin.executeMethod('PasteText', [text]);
+                
+                // Optional: Show feedback
+                console.log('Text inserted successfully');
+            }
+
+            // Replace placeholders in the document with actual values
+            function replacePlaceholders() {
+                if (!userData) return;
+                
+                console.log('Replacing placeholders with actual values...');
+                
+                // For each field in userData that has a non-null value
+                for (const [key, value] of Object.entries(userData)) {
+                    if (value !== null && value !== undefined) {
+                        const placeholder = `{{${key}}}`;
+                        console.log(`Searching for placeholder: ${placeholder}`);
+                        
+                        // Use Search and Replace API
+                        window.Asc.plugin.executeMethod('SearchAndReplace', [
+                            {
+                                searchString: placeholder,
+                                replaceString: String(value),
+                                matchCase: true
+                            }
+                        ]);
+                    }
+                }
+                
+                console.log('Placeholder replacement complete');
+            }
+
+            // Plugin button handler (if needed)
+            window.Asc.plugin.button = function(id) {
+                this.executeCommand('close', '');
+            };
+
+        })(window, undefined);
+    </script>
+</body>
+</html>
+```
+
+Note: Add a `icon.svg` file into the `public/plugins/insertdata/resources/`
+
+
+Create a new page `src/Form.js`
+
+```
+import React, { useState } from 'react';
+import Docxtemplater from 'docxtemplater';
+import PizZip from 'pizzip';
+import { saveAs } from 'file-saver';
+import expressionParser from 'docxtemplater/expressions';
+
+export const Form = () => {
+  const [loading, setLoading] = useState(false);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+
+  const generateDocument = async () => {
+    try {
+      setLoading(true);
+
+      // Fetch the .docx file (template) from your API
+      const fileResponse = await fetch('http://localhost:5000/api/template'); // <-- your backend endpoint
+      const fileArrayBuffer = await fileResponse.arrayBuffer();
+      console.log(fileResponse);
+
+      // Load the binary data into PizZip
+      const zip = new PizZip(fileArrayBuffer);
+
+      // Initialize Docxtemplater with better configuration
+      const doc = new Docxtemplater(zip, {
+        paragraphLoop: true,
+        linebreaks: true,
+        parser: expressionParser,
+        delimiters: {
+          start: '{{',
+          end: '}}'
+        },
+        nullGetter() {
+          return "";
+        },
+      });
+
+      const dataResponse = await fetch(`http://lcalhost:5000/api/data?firstName=${firstName}&lastName=${lastName}&email=${email}`)
+
+      const data = await dataResponse.json();
+      console.log(data);
+      
+      doc.render(data);
+      console.log(doc);
+      
+      const out = doc.getZip().generate({
+        type: 'blob',
+        mimeType:
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      });
+
+      saveAs(out, `${Date.now() || 'output'}.docx`);
+      alert('Document generated successfully!');
+    } catch (error) {
+      console.error('Error generating document:', error);
+      
+      // Better error handling
+      if (error.properties && error.properties.errors instanceof Array) {
+        const errorMessages = error.properties.errors
+          .map(err => `${err.properties.explanation} (in ${err.properties.file})`)
+          .join('\n');
+        alert(`Template Error:\n\n${errorMessages}\n\n FIX: Open your Word template and retype each placeholder ({{firstName}}, {{lastName}}, {{email}}) without any formatting changes. Delete the old ones completely and type them fresh.`);
+      } else {
+        alert(`Error: ${error.message || 'Failed to generate document'}`);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="p-4">
+      <h1>Generate .docx from API</h1>
+      <input type="text" placeholder="First Name" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+      <input type="text" placeholder="Last Name" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+      <input type="text" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+      <button
+        onClick={generateDocument}
+        disabled={loading}
+        className="px-4 py-2 bg-blue-600 text-white rounded-md"
+      >
+        {loading ? 'Generating...' : 'Generate Document'}
+      </button>
+      <p>Template and data both come from API endpoints.</p>
+    </div>
+  );
+};
+
+
+```
+
+
+### Add two more API in server (Example: Express Server)
+
+```
+app.get('/api/template', async (req, res) => {
+  try {
+    // doc link
+    const fileUrl = 'http://localhost:3000/assets/template.docx'; // file live link
+
+    // Fetch the file from the URL
+    const response = await fetch(fileUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch file: ${response.statusText}`);
+    }
+
+    // Convert response to buffer
+    const fileBuffer = await response.arrayBuffer();
+
+    // Send the file as response
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    );
+    res.setHeader('Content-Disposition', 'attachment; filename=offer-letter.docx');
+    res.send(Buffer.from(fileBuffer));
+  } catch (err) {
+    console.error('Error fetching template:', err);
+    res.status(500).json({ error: 'Failed to fetch remote DOCX template' });
+  }
+});
+
+
+app.get('/api/data', async (req, res) => {
+  try {
+    const queryData = {};
+    // dynamic query from the frontend for both admin/user
+    for (const key in req.query) {
+      queryData[key] = req.query[key] || "";
+    }
+    return res.status(200).json(queryData);
+  } catch (error) {
+    console.log("Error in /api/data:", error);
+    return res.status(500).json({ error: "Failed to fetch user data" });
+  }
+});
+
+```
+
+Important: In docx if you add {{firstName}}, {{lastName}}, {{email}} Then it will auto convert from dynamically add from the Frontend `From.js`
+
+### Note: You can use the above steps to download docx including dynamic content
+
 ## Troubleshooting
 
 ### Common Issues
@@ -348,4 +807,4 @@ docker inspect onlyoffice/documentserver
 
 ** Document Version:** 1.0.0
 
-** Last Updated:** October 09, 2025   
+** Last Updated:** October 14, 2025   
