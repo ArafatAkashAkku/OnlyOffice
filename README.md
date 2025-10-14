@@ -277,6 +277,25 @@ Install Angular-Expressions Docstemplater File-Saver Pizzip on Frontend
 npm install angular-expressions docxtemplater file-saver pizzip 
 ```
 
+### angular-expressions
+
+A small library to evaluate expressions in templates, like {{firstName}} or {{age + 1}}.
+Used with docxtemplater to dynamically calculate or replace values in a DOCX template.
+
+### docxtemplater
+
+A library to generate Word (.docx) documents from templates.
+It reads a DOCX file with placeholders (e.g., {{name}}) and fills them with data programmatically.
+
+### file-saver
+
+A library to save files directly from the browser.
+Used to let users download generated DOCX files after filling them with data.
+
+### pizzip
+
+Handles reading and writing ZIP files (DOCX files are ZIP under the hood), enabling docxtemplater to modify templates.
+
 ### New Integration Step by Step on Frontend
 Located in `public/`
 
@@ -439,7 +458,7 @@ Now in the `public/plugins/insertdata/index.html`
     <script src="https://onlyoffice.github.io/sdkjs-plugins/v1/plugins.js"></script>
 </head>
 <body>
-    <h3>📋 Insert Data Fields</h3>
+    <h3>Insert Data Fields</h3>
     <div id="content">
         <div class="loading">Loading data...</div>
     </div>
